@@ -47,7 +47,16 @@
       width: 122px;
     }
   </style>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "69e35e9d92b14b18ae0060b14ac6ec10"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
 </head>
+//trackjs
 
 <body>
   <main>
@@ -88,6 +97,16 @@
   </main>
 
   <script>
+
+    //(https://javascript.info/custom-errors)
+    class ValidationError extends Error {
+      constructor(message) {
+        super(message); // (1)
+        this.name = "ValidationError"; // (2)
+      }
+    }
+
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +114,108 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+
+      try {
+        if (firstNum === '' || secondNum === '') {
+          throw new ValidationError("Both numbers must be provided");
+        }
+        if (operator === '/' && secondNum === '0') {
+          throw new ValidationError("Cannot divide by zero");
+        }
+
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (err) {
+        if (err instanceof ValidationError) {
+          output.innerHTML = err.message;
+        } else {
+          output.innerHTML = "An unexpected error occurred";
+        } 
+      } finally {
+          console.log("Calculation attempted");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    errorBtns[0].addEventListener('click', () => {
+      console.log("Console log");
+    });
+    errorBtns[1].addEventListener('click', () => {
+      console.error("Console error");
+    });
+    errorBtns[2].addEventListener('click', () => {
+      console.count("Console count");
+    });
+    errorBtns[3].addEventListener('click', () => {
+      console.warn("Console warn");
+    });
+    //http://developer.chrome.com/docs/devtools/console/api/#assert 
+    errorBtns[4].addEventListener('click', () => {
+      const x = 5;
+      const y = 3;
+      const reason = 'x is expected to be less than y';
+      console.assert(x < y, {x, y, reason});
+    });
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    });
+    errorBtns[6].addEventListener('click', () => {
+      console.dir(document.head);
+    });
+    errorBtns[7].addEventListener('click', () => {
+      console.dirxml(document);
+    });
+    errorBtns[8].addEventListener('click', () => {
+      console.group("Group Start");
+      console.log("Inside group");
+    });
+    errorBtns[9].addEventListener('click', () => {
+      console.groupEnd();
+    });
+    errorBtns[10].addEventListener('click', () => {
+      var people = [
+        {
+          name: 'Bob',
+          number: 100,
+        },
+        {
+          name: 'Ross',
+          number: '1995',
+        },
+        {
+          name: 'Henry',
+          number: 1,
+        }
+      ];
+      console.table(people);
+    });
+    errorBtns[11].addEventListener('click', () => {
+      console.time("Timer");
+    });
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd("Timer");
+    });
+    //http://developer.chrome.com/docs/devtools/console/api/#trace
+    errorBtns[13].addEventListener('click', () => {
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    });
+
+    errorBtns[14].addEventListener('click', () => {
+      nonExistentFunction();
+    });
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log(`Global error caught: ${message} at ${source}:${lineno}:${colno}`);
+    };
+
   </script>
 </body>
 
